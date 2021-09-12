@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=windows-1251" />
+        <title>Chat</title>
+    </head>
+    <body>
+        <header><h1 align="center">Тестовое задание</h1></header>
+
+        <div align="center">
+            <button onClick="showForm(event)" id="connect">Начать</button>
+            <form action="" onsubmit="sendMessage(event)" id="form" style="display: none">
+                <input type="text" id="messageText" autocomplete="off"/>
+                <button>Отправить</button>
+            </form>
+                <ol id='messages'></ol>
+        </div>
+        <style>
+            ol {
+                margin: 5% 30% 10px 30%;
+                margin-top: 10px;
+            }
+            li {
+                padding: 5px 10px 5px 10px;
+            }
+        </style>
+        <script>
+            var clientID = Date.now();
+            var ws = new WebSocket(`ws://localhost:8000/ws/${clientID}`);
+
+            function processMessage(event) {
+                var messages = document.getElementById('messages')
+                var message = document.createElement('li')
+                var content = document.createTextNode(event.data)
+                message.appendChild(content);
+                messages.appendChild(message);
+            }
+
+            ws.onmessage = processMessage;
+
+            function sendMessage(event) {
+                var input = document.getElementById("messageText")
+                var message = document.createElement('li')
+                var content = document.createTextNode(input.value)
+                message.appendChild(content);
+                messages.appendChild(message);
+                ws.send(input.value);
+
+                input.value = ''
+                event.preventDefault()
+            }
+
+            function showForm(event) {
+                var button = document.getElementById("connect");
+                var form = document.getElementById("form");
+                button.style.display = "none";
+                form.style.display = "block";
+            }
+
+        </script>
+    </body>
+</html>
